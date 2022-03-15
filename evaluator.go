@@ -94,6 +94,9 @@ func (s StringsModifyFilterer) Filter(file *gitdiff.File) *Reasons {
 type EmptyLineFilterer struct{}
 
 func (s EmptyLineFilterer) Filter(file *gitdiff.File) *Reasons {
+	if file.IsNew {
+		return nil
+	}
 	for _, fragments := range file.TextFragments {
 		for _, line := range fragments.Lines {
 			if line.Op != gitdiff.OpContext {
