@@ -24,7 +24,6 @@ func (e Evaluator) Evaluate(r io.Reader) ([]*gitdiff.File, []*Reasons, error) {
 		SuffixFilterer{"_test.go"},
 		CommentFilterer{},
 		EmptyLineFilterer{},
-		StringsModifyFilterer{},
 	}
 
 	filtered := []*gitdiff.File{}
@@ -56,6 +55,9 @@ type Reasons struct {
 type StringsModifyFilterer struct{}
 
 func (s StringsModifyFilterer) Filter(file *gitdiff.File) *Reasons {
+
+	total := 0
+	stringModiry := 0
 	for _, fragments := range file.TextFragments {
 		for i, line := range fragments.Lines {
 			if line.Op != gitdiff.OpAdd {
@@ -74,12 +76,16 @@ func (s StringsModifyFilterer) Filter(file *gitdiff.File) *Reasons {
 				continue
 			}
 
+			total++
 			if strings.ContainsAny(diffs[0].Text, `"'`) && strings.ContainsAny(diffs[2].Text, `"'`) {
-				return &Reasons{
-					File:    file.NewName,
-					Message: "only string modified",
-				}
+				stringModiry++
 			}
+		}
+	}
+	if total != 0 && total == stringModiry {
+		return &Reasons{
+			File:    file.NewName,
+			Message: "only string modified",
 		}
 	}
 	return nil
