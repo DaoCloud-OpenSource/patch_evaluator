@@ -125,6 +125,9 @@ func (s CommentFilterer) Filter(file *gitdiff.File) *Reasons {
 			if strings.HasPrefix(strings.TrimSpace(line.Line), "//") {
 				continue
 			}
+			if strings.HasPrefix(strings.TrimSpace(line.Line), "#") {
+				continue
+			}
 			return nil
 		}
 	}
