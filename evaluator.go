@@ -18,7 +18,7 @@ func (e Evaluator) Evaluate(r io.Reader) ([]*gitdiff.File, []*Reasons, error) {
 	}
 
 	filterers := []Filterer{
-		FocusSuffixFilterer{".sh", ".bash", ".c", ".go", ".py", ".java", ".cpp", ".h", ".hpp"},
+		FocusSuffixFilterer{".sh", ".bash", ".c", ".go", ".py", ".java", ".cpp", ".h", ".hpp", ".yaml", ".yml"},
 		PrefixFilterer{"vendor/", "test/", "tests/"},
 		ContainsFilterer{"generated", "testdata"},
 		SuffixFilterer{"_test.go"},
