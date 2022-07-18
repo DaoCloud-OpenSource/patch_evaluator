@@ -20,7 +20,7 @@ func main() {
 	defer patch.Close()
 
 	evaluator := patch_evaluator.Evaluator{}
-	files, reasons, err := evaluator.Evaluate(patch)
+	files, reasonsLowValue, reasonsNoValue, err := evaluator.Evaluate(patch)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,8 +30,13 @@ func main() {
 		fmt.Printf("\t%s\n", file.NewName)
 	}
 
-	fmt.Printf("valueless: %d\n", len(reasons))
-	for _, reason := range reasons {
+	fmt.Printf("low-value: %d\n", len(reasonsLowValue))
+	for _, reason := range reasonsLowValue {
+		fmt.Printf("\t%s: %s\n", reason.File, reason.Message)
+	}
+
+	fmt.Printf("no-value: %d\n", len(reasonsNoValue))
+	for _, reason := range reasonsNoValue {
 		fmt.Printf("\t%s: %s\n", reason.File, reason.Message)
 	}
 }

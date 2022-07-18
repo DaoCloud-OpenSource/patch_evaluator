@@ -11,35 +11,47 @@ import (
 type Evaluator struct {
 }
 
-func (e Evaluator) Evaluate(r io.Reader) ([]*gitdiff.File, []*Reasons, error) {
+func (e Evaluator) Evaluate(r io.Reader) ([]*gitdiff.File, []*Reasons, []*Reasons, error) {
 	files, _, err := gitdiff.Parse(r)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	filterers := []Filterer{
+	lowValue := []Filterer{
 		FocusSuffixFilterer{".sh", ".bash", ".c", ".go", ".py", ".java", ".cpp", ".h", ".hpp", ".yaml", ".yml"},
-		PrefixFilterer{"vendor/", "test/", "tests/"},
-		ContainsFilterer{"generated", "testdata"},
+		PrefixFilterer{"test/", "tests/"},
 		SuffixFilterer{"_test.go"},
+	}
+
+	noValue := []Filterer{
+		PrefixFilterer{"vendor/"},
+		ContainsFilterer{"generated", "testdata"},
 		CommentFilterer{},
 		EmptyLineFilterer{},
 	}
 
 	filtered := []*gitdiff.File{}
 
-	reasons := []*Reasons{}
+	reasonsLowValue := []*Reasons{}
+
+	reasonsNoValue := []*Reasons{}
 loop:
 	for _, file := range files {
-		for _, filterer := range filterers {
+		for _, filterer := range noValue {
 			if rea := filterer.Filter(file); rea != nil {
-				reasons = append(reasons, rea)
+				reasonsNoValue = append(reasonsNoValue, rea)
+				continue loop
+			}
+		}
+		for _, filterer := range lowValue {
+			if rea := filterer.Filter(file); rea != nil {
+				reasonsLowValue = append(reasonsLowValue, rea)
 				continue loop
 			}
 		}
 		filtered = append(filtered, file)
 	}
-	return filtered, reasons, nil
+	return filtered, reasonsLowValue, reasonsNoValue, nil
 }
 
 var contentDiff = diffmatchpatch.New()
