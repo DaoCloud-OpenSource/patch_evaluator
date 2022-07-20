@@ -24,6 +24,7 @@ func (e Evaluator) Evaluate(r io.Reader) ([]*gitdiff.File, []*Reasons, []*Reason
 	}
 
 	noValue := []Filterer{
+		SuffixFilterer{".md"},
 		PrefixFilterer{"vendor/"},
 		ContainsFilterer{"generated", "testdata"},
 		CommentFilterer{},
@@ -132,6 +133,9 @@ func (s CommentFilterer) Filter(file *gitdiff.File) *Reasons {
 	for _, fragments := range file.TextFragments {
 		for _, line := range fragments.Lines {
 			if line.Op != gitdiff.OpAdd {
+				continue
+			}
+			if strings.TrimSpace(line.Line) == "" {
 				continue
 			}
 			if strings.HasPrefix(strings.TrimSpace(line.Line), "//") {
