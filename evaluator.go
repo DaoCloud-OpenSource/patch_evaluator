@@ -11,24 +11,10 @@ import (
 type Evaluator struct {
 }
 
-func (e Evaluator) Evaluate(r io.Reader) ([]*gitdiff.File, []*Reasons, []*Reasons, error) {
+func (e Evaluator) Evaluate(r io.Reader, lowValue []Filterer, noValue []Filterer) ([]*gitdiff.File, []*Reasons, []*Reasons, error) {
 	files, _, err := gitdiff.Parse(r)
 	if err != nil {
 		return nil, nil, nil, err
-	}
-
-	lowValue := []Filterer{
-		FocusSuffixFilterer{".sh", ".bash", ".c", ".go", ".py", ".java", ".cpp", ".h", ".hpp", ".yaml", ".yml"},
-		PrefixFilterer{"test/", "tests/"},
-		SuffixFilterer{"_test.go"},
-	}
-
-	noValue := []Filterer{
-		SuffixFilterer{".md"},
-		PrefixFilterer{"vendor/"},
-		ContainsFilterer{"generated", "testdata"},
-		CommentFilterer{},
-		EmptyLineFilterer{},
 	}
 
 	filtered := []*gitdiff.File{}
@@ -206,5 +192,14 @@ func (s ContainsFilterer) Filter(file *gitdiff.File) *Reasons {
 			}
 		}
 	}
+	return nil
+}
+
+type NotFilter struct {
+	Filterer Filterer
+}
+
+func (s NotFilter) Filter(file *gitdiff.File) *Reasons {
+	s.Filterer.Filter(file)
 	return nil
 }
