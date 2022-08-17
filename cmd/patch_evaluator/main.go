@@ -44,7 +44,6 @@ var (
 				patch_evaluator.PrefixFilterer{
 					"content/de", "content/es", "content/fr", "content/hi", "content/id", "content/it", "content/ja", "content/ko", "content/no", "content/pl", "content/pt-br", "content/ru", "content/uk", "content/vi",
 				},
-				patch_evaluator.CommentFilterer{},
 				patch_evaluator.EmptyLineFilterer{},
 			},
 		},
