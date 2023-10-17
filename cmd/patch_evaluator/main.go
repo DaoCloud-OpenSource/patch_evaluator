@@ -27,7 +27,7 @@ var (
 	define = map[string]ValueDefine{
 		"code": {
 			LowValue: []patch_evaluator.Filterer{
-				patch_evaluator.FocusSuffixFilterer{".sh", ".bash", ".c", ".go", ".py", ".java", ".cpp", ".h", ".hpp", ".yaml", ".yml"},
+				patch_evaluator.FocusSuffixFilterer{".sh", ".bash", ".c", ".go", ".py", ".java", ".rs", ".cpp", ".h", ".hpp", ".yaml", ".yml"},
 				patch_evaluator.PrefixFilterer{"test/", "tests/"},
 				patch_evaluator.SuffixFilterer{"_test.go"},
 			},
